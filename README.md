@@ -18,7 +18,7 @@ user-supplied YouTube background video rendered via FFmpeg.
 - PHP 8.1+ / Laravel 11
 - Queue worker (database or Redis)
 - FFmpeg + yt-dlp
-- OpenAI TTS (pluggable provider)
+- Piper TTS (offline, free) or OpenAI TTS (pluggable)
 
 ## Requirements
 
@@ -26,6 +26,7 @@ user-supplied YouTube background video rendered via FFmpeg.
 - Composer
 - FFmpeg (CLI)
 - yt-dlp (CLI)
+- Piper TTS binary + model (for offline TTS)
 - Node.js (only if you plan to build frontend assets)
 
 ## Setup
@@ -42,8 +43,10 @@ php artisan storage:link
 Add these to `.env` as needed:
 
 ```
+TTS_PROVIDER=piper
+PIPER_PATH=/usr/local/bin/piper
+PIPER_MODEL_PATH=/path/to/en_US-amy-medium.onnx
 OPENAI_API_KEY=your-key-here
-TTS_PROVIDER=openai
 FFMPEG_PATH=/usr/bin/ffmpeg
 YTDLP_PATH=/usr/local/bin/yt-dlp
 QUEUE_CONNECTION=database
@@ -61,12 +64,19 @@ In a separate terminal, start the queue worker:
 php artisan queue:work
 ```
 
+## Piper Setup (Offline TTS)
+
+1) Download Piper binary for your OS.
+2) Download a voice model (ONNX file).
+3) Set `PIPER_PATH` and `PIPER_MODEL_PATH` in `.env`.
+
 ## Notes
 
 - The render pipeline runs in a queue job and can take time depending on the
   length of the Reddit thread and background video.
 - Make sure `ffmpeg` and `yt-dlp` are accessible at the paths configured in
   `.env`.
+- For offline TTS, install Piper and set `PIPER_PATH` and `PIPER_MODEL_PATH`.
 
 ## Project Structure (High Level)
 

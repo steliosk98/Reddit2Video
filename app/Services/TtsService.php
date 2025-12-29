@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
+use Symfony\Component\Process\Process;
 
 class TtsService
 {
@@ -10,8 +11,12 @@ class TtsService
     {
         $provider = config('services.tts.provider', env('TTS_PROVIDER', 'openai'));
 
-        if ($provider !== 'openai') {
+        if (! in_array($provider, ['openai', 'piper'], true)) {
             throw new \RuntimeException("Unsupported TTS provider: {$provider}");
+        }
+
+        if ($provider === 'piper') {
+            return $this->synthesizeWithPiper($text, $outputPath);
         }
 
         $apiKey = config('services.openai.key', env('OPENAI_API_KEY'));
@@ -43,6 +48,37 @@ class TtsService
         }
 
         file_put_contents($outputPath, $audioBinary);
+
+        return [
+            'audio_path' => $outputPath,
+            'timings' => null,
+        ];
+    }
+
+    private function synthesizeWithPiper(string $text, string $outputPath): array
+    {
+        $piper = env('PIPER_PATH', 'piper');
+        $model = env('PIPER_MODEL_PATH');
+
+        if (! $model) {
+            throw new \RuntimeException('PIPER_MODEL_PATH is not configured.');
+        }
+
+        $dir = dirname($outputPath);
+        if (! is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        $process = new Process([
+            $piper,
+            '--model',
+            $model,
+            '--output_file',
+            $outputPath,
+        ]);
+        $process->setInput($text);
+        $process->setTimeout(120);
+        $process->mustRun();
 
         return [
             'audio_path' => $outputPath,
