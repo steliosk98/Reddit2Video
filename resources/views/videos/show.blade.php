@@ -18,13 +18,13 @@
             @endif
         </div>
 
-        @if($video->status === 'completed' && $video->output_path)
+        @if($video->status === 'completed' && $video->output_url)
             <div class="space-y-4">
                 <video controls class="w-full rounded-lg">
-                    <source src="{{ asset(str_replace(storage_path('app/public/'), 'storage/', $video->output_path)) }}" type="video/mp4">
+                    <source src="{{ $video->output_url }}" type="video/mp4">
                 </video>
                 <a
-                    href="{{ asset(str_replace(storage_path('app/public/'), 'storage/', $video->output_path)) }}"
+                    href="{{ $video->output_url }}"
                     class="inline-flex items-center justify-center rounded-lg bg-emerald-400 px-5 py-2 font-semibold text-slate-900"
                     download
                 >

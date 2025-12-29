@@ -41,8 +41,9 @@ class VideoRenderService
 
         $ffmpeg = env('FFMPEG_PATH', 'ffmpeg');
 
+        $subtitleFilter = sprintf("subtitles='%s'", $this->escapeFilterPath($subtitlePath));
         $filter = "scale=1080:1920:force_original_aspect_ratio=increase,";
-        $filter .= "crop=1080:1920,subtitles={$subtitlePath}";
+        $filter .= "crop=1080:1920,{$subtitleFilter}";
 
         $process = new Process([
             $ffmpeg,
@@ -61,5 +62,10 @@ class VideoRenderService
         $process->mustRun();
 
         return $outputPath;
+    }
+
+    private function escapeFilterPath(string $path): string
+    {
+        return str_replace(['\\', ':'], ['\\\\', '\\:'], $path);
     }
 }

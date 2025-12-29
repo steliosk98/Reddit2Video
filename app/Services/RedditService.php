@@ -14,6 +14,10 @@ class RedditService
         $response->throw();
 
         $payload = $response->json();
+        if (! is_array($payload) || count($payload) < 2) {
+            throw new \RuntimeException('Unexpected Reddit response format.');
+        }
+
         $post = $payload[0]['data']['children'][0]['data'] ?? [];
         $comments = $payload[1]['data']['children'] ?? [];
 

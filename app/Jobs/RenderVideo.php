@@ -21,6 +21,10 @@ class RenderVideo implements ShouldQueue
     use Queueable;
     use SerializesModels;
 
+    public int $tries = 2;
+
+    public array $backoff = [30, 120];
+
     public function __construct(private readonly int $videoId)
     {
     }

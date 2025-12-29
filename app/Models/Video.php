@@ -22,4 +22,19 @@ class Video extends Model
     {
         return str_replace('_', ' ', $this->status ?? 'pending');
     }
+
+    public function getOutputUrlAttribute(): ?string
+    {
+        if (! $this->output_path) {
+            return null;
+        }
+
+        $publicRoot = storage_path('app/public/');
+        if (str_starts_with($this->output_path, $publicRoot)) {
+            $relative = ltrim(str_replace($publicRoot, '', $this->output_path), '/');
+            return asset('storage/' . $relative);
+        }
+
+        return null;
+    }
 }
