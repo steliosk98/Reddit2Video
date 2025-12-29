@@ -35,4 +35,12 @@ return [
         ],
     ],
 
+    'openai' => [
+        'key' => env('OPENAI_API_KEY'),
+    ],
+
+    'tts' => [
+        'provider' => env('TTS_PROVIDER', 'openai'),
+    ],
+
 ];
